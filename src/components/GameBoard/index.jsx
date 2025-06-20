@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import StrikeThrough from "../StrikeThrough";
 import { useNavigate } from "react-router-dom";
+import Button from "../Button";
 
 const GameBoard = () => {
   const navigate = useNavigate();
@@ -83,12 +84,7 @@ const GameBoard = () => {
         <div className="flex items-center gap-2">
           <span className="font-bold text-xl">TicTacToe</span>
         </div>
-        <button 
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-        >
-          Sign Out
-        </button>
+        <Button onClick={() => navigate('/')}>Sign Out</Button>
       </header>
 
       {/* Main Content */}

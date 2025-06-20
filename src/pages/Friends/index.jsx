@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../components/Button';
 
 const Friends = () => {
   const navigate = useNavigate();
@@ -22,12 +23,7 @@ const Friends = () => {
         <div className="flex items-center gap-2">
           <span className="font-bold text-xl">TicTacToe</span>
         </div>
-        <button 
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-        >
-          Sign Out
-        </button>
+        <Button onClick={() => navigate('/')}>Sign Out</Button>
       </header>
 
       {/* Main Content */}
@@ -59,9 +55,7 @@ const Friends = () => {
                     <p className="text-sm text-gray-500">{friend.status}</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm">
-                  Invite
-                </button>
+                <Button className="text-sm">Invite</Button>
               </div>
             ))}
           </div>
@@ -81,12 +75,8 @@ const Friends = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm">
-                    Accept
-                  </button>
-                  <button className="px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm">
-                    Decline
-                  </button>
+                  <Button className="text-sm">Accept</Button>
+                  <Button className="border border-gray-200 hover:bg-gray-50 text-sm bg-white text-black">Decline</Button>
                 </div>
               </div>
             ))}

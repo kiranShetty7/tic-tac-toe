@@ -1,8 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "../../components/Button";
 
 const GameMode = () => {
   const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -11,34 +16,29 @@ const GameMode = () => {
         <div className="flex items-center gap-2">
           <span className="font-bold text-xl">TicTacToe</span>
         </div>
-        <button 
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-        >
-          Sign Out
-        </button>
+        <Button onClick={handleSignOut}>Sign Out</Button>
       </header>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4">
         <h1 className="text-4xl font-bold mb-12">Choose Your Game Mode</h1>
-        
+
         <div className="flex flex-col gap-4 w-full max-w-xs">
-          <button
-            onClick={() => navigate('/toss')}
-            className="w-full px-6 py-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+          <Button
+            onClick={() => navigate("/toss")}
+            className="w-full flex items-center justify-center gap-2 px-6 py-4"
           >
             <span className="text-xl">🤖</span>
             Play with AI
-          </button>
-          
-          <button
-            onClick={() => navigate('/toss')}
-            className="w-full px-6 py-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+          </Button>
+
+          <Button
+            onClick={() => navigate("/friends")}
+            className="w-full flex items-center justify-center gap-2 px-6 py-4"
           >
             <span className="text-xl">👥</span>
             Play Online
-          </button>
+          </Button>
         </div>
       </main>
 
@@ -50,4 +50,4 @@ const GameMode = () => {
   );
 };
 
-export default GameMode; 
+export default GameMode;

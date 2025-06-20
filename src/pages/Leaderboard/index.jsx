@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../components/Button';
 
 const Leaderboard = () => {
   const navigate = useNavigate();
@@ -21,12 +22,7 @@ const Leaderboard = () => {
         <div className="flex items-center gap-2">
           <span className="font-bold text-xl">TicTacToe</span>
         </div>
-        <button 
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-        >
-          Sign Out
-        </button>
+        <Button onClick={() => navigate('/')}>Sign Out</Button>
       </header>
 
       {/* Main Content */}
