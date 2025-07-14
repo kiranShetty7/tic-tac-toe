@@ -65,7 +65,7 @@ const StrikeThrough = ({ pattern }) => {
   const strikePattern = getStrikePattern();
   return (
     <div
-      className="w-1 h-60 border border-red-500 absolute"
+      className="h-60 border border-black-1500 absolute"
       style={strikePattern}
     />
   );

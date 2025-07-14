@@ -12,8 +12,9 @@ const Toss = ({ toggleTossMode, setIsUserTossWinner }) => {
     setIsUserTossWinner(isUserWinner);
     setTimeout(() => {
       setIsFlipping(false);
+      toggleTossMode(false);
     }, 1500);
-    toggleTossMode(false);
+    
   };
 
   return (

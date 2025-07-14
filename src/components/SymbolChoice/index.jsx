@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../Button";
 import { decisionMaker } from "../../helper";
@@ -8,14 +8,14 @@ const SymbolChoice = ({ isUserTossWinner }) => {
   const [userSymbol, setUserSymbol] = useState("X");
 
   useEffect(() => {
-    if(!isUserTossWinner){
+    if (!isUserTossWinner) {
       setUserSymbol(decisionMaker() ? "X" : "O");
     }
   }, []);
 
   const handleUserSymbol = (symbol) => {
     setUserSymbol(symbol);
-    startGame()
+    startGame();
   };
 
   const startGame = () => {
@@ -58,7 +58,14 @@ const SymbolChoice = ({ isUserTossWinner }) => {
             Sorry! You lost the toss.
           </h1>
           <p className="text-gray-600 mb-12 text-center">
-            The AI has chosen <span className="font-bold text-black">{userSymbol === "X" ? "O" : "X"}</span> for its game.<br />You will play as <span className="font-bold text-black">{userSymbol}</span>.
+            The AI has chosen{" "}
+            <span className="font-bold text-black">
+              {userSymbol === "X" ? "O" : "X"}
+            </span>{" "}
+            for its game.
+            <br />
+            You will play as{" "}
+            <span className="font-bold text-black">{userSymbol}</span>.
           </p>
           <Button onClick={startGame}>Start Game</Button>
         </div>
