@@ -6,230 +6,123 @@ import { randomizedSelectionFromArray } from "../../helper";
 
 const GameBoard = () => {
   const navigate = useNavigate();
-  const [squares, setSquares] = useState([
-    { id: 1, value: "" },
-    { id: 2, value: "" },
-    { id: 3, value: "" },
-    { id: 4, value: "" },
-    { id: 5, value: "" },
-    { id: 6, value: "" },
-    { id: 7, value: "" },
-    { id: 8, value: "" },
-    { id: 9, value: "" },
-  ]);
-  const [pattern, setPattern] = useState(-1);
+  const [squares, setSquares] = useState(Array(9).fill(""));
+  const [strikePattern, setStrikePattern] = useState(-1);
   const [player, setPlayer] = useState("X");
-  const [gameModeDetails, setGameModeDetails] = useState({
-    noOfMoves: {
-      X: 1,
-      O: 1,
-    },
-  });
   const winPatterns = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9],
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
     [1, 4, 7],
     [2, 5, 8],
-    [3, 6, 9],
-    [1, 5, 9],
-    [3, 5, 7],
+    [0, 4, 8],
+    [2, 4, 6],
   ];
+
+  const getEmptyPositions = (array) =>
+    array
+      .map((square, index) => (square === "" ? index : ""))
+      .filter((item) => item !== "");
+
+  const getWinInfo = (player) => {
+    for (let i = 0; i < winPatterns.length; i++) {
+      const pattern = winPatterns[i];
+      const [a, b, c] = pattern;
+      const patternPositionOnGameboard = [squares[a], squares[b], squares[c]];
+
+      const filteredPlayerPosition = patternPositionOnGameboard.filter(
+        (position) => position === player
+      );
+
+      const emptyPosition = getEmptyPositions(patternPositionOnGameboard);
+
+      if (filteredPlayerPosition.length === 2 && emptyPosition.length === 1) {
+        setStrikePattern(i);
+        return {
+          winningMove: pattern[emptyPosition[0]],
+          pattern: i,
+        };
+      }
+    }
+
+    return {
+      winningMove: -1,
+      pattern: -1,
+    };
+  };
+
+  const makeFirstMove = () => {
+    const initialMoves = [0, 2, 4, 6, 8];
+    const emptyPositions = getEmptyPositions(squares);
+    const availableMoves = initialMoves.filter((move) =>
+      emptyPositions.includes(move)
+    );
+
+    const index = randomizedSelectionFromArray(availableMoves.length);
+    const aiMove = availableMoves[index];
+    return aiMove;
+  };
+
+  const getBestMove = () => {
+    const winData = getWinInfo("O");
+    const { winningMove, pattern } = winData;
+    if (winningMove >= 0) {
+      setStrikePattern(pattern);
+      return winningMove;
+    }
+
+    const blockData = getWinInfo("X");
+    const { winningMove: blockingMove } = blockData;
+    if (blockingMove >= 0) return blockingMove;
+
+    if (winningMove < 0 && blockingMove < 0) {
+      const existingAIPosition = squares.findIndex((square) => square === "O");
+      for (let pattern of winPatterns) {
+        const emptyPositions = pattern
+          .map((item) => (squares[item] === "" ? item : ""))
+          .filter((item) => item !== "");
+        if (
+          pattern.includes(existingAIPosition) &&
+          emptyPositions?.length >= 1
+        ) {
+          const randomizedIndex = randomizedSelectionFromArray(
+            emptyPositions?.length
+          );
+          return emptyPositions[randomizedIndex];
+        }
+      }
+    }
+  };
+
+  const makeAiMove = () => {
+    const aiMoveCount = squares.filter((square) => square === "O").length;
+    let aiMove;
+    ``;
+    if (aiMoveCount === 0) aiMove = makeFirstMove();
+    if (aiMoveCount > 0) {
+      aiMove = getBestMove();
+    }
+    handleSquareClick(aiMove);
+  };
 
   useEffect(() => {
     if (player === "O") {
       setTimeout(() => {
-        makeSystemMove();
-      }, 1100);
+        makeAiMove();
+      }, 1500);
     }
   }, [player]);
 
-  const matchPatterns = (playerValues) => {
-    for (let i = 0; i < winPatterns.length; i++) {
-      const pattern = winPatterns[i];
-      const patternMatch = pattern.every((item) => playerValues.includes(item));
-      if (patternMatch) {
-        setPattern(i);
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const checkWinner = (latestData) => {
-    let xValues = [],
-      oValues = [];
-    latestData.forEach((square) => {
-      if (square.value === "X") xValues.push(square.id);
-      else if (square.value === "O") oValues.push(square.id);
-    });
-
-    const isXwinner = matchPatterns(xValues);
-    const isOwinner = !isXwinner && matchPatterns(oValues);
-  };
-
-  const makeSystemMove = () => {
-    const systemsMove = decideNextMove();
-    handleSquareClick(systemsMove);
-  };
-
-  const handleSquareClick = (id) => {
-    if (!squares[id - 1].value) {
-      const updatedData = squares.map((item) => {
-        if (item?.id === id) {
-          return {
-            ...item,
-            value: player,
-          };
-        } else return item;
-      });
-
-      checkWinner(updatedData);
-
-      setSquares(() => updatedData);
-      setGameModeDetails((prev) => ({
-        ...prev,
-        noOfMoves: {
-          ...prev.noOfMoves,
-          [player]: prev.noOfMoves[player] + 1,
-        },
-      }));
-      setPlayer((prev) => (prev === "X" ? "O" : "X"));
-    }
-  };
-
-  const getUnavailableSquares = () =>
-    squares
-      .filter((square) => square.value)
-      .map((filteredSquare) => filteredSquare.id);
-
-  const getAvailableOptions = (totalArray, unavailableOptions) =>
-    totalArray?.filter((item) => !unavailableOptions.includes(item));
-
-  const getSystemSquares = () =>
-    squares.filter((square) => square.value === "O");
-
-  const getPlayerSquares = () =>
-    squares.filter((square) => square.value === "X");
-
-  const makeFirstMove = () => {
-    const firstMoveOptions = [1, 3, 5, 7, 9];
-    const unAvailableOptions = getUnavailableSquares();
-    const availableOptions = getAvailableOptions(
-      firstMoveOptions,
-      unAvailableOptions
-    );
-
-    const firstMoveIndex = randomizedSelectionFromArray(
-      availableOptions.length
-    );
-
-    const move = availableOptions[firstMoveIndex];
-
-    return move;
-  };
-
-  const findWinningPosition = () => {
-    const existingSystemPositions = getSystemSquares();
-    const existingPlayerPositions = getPlayerSquares();
-
-    const matchingWinPatterns = winPatterns.filter((winPattern) => {
-      const systemHasAll = existingSystemPositions.every((index) =>
-        winPattern.includes(index?.id)
+  const handleSquareClick = (index) => {
+    if (!squares[index] || player === "O")
+      setSquares((square) =>
+        square.map((value, squareIndex) => {
+          if (squareIndex === index) return player;
+          return value;
+        })
       );
-
-      const playerDoesNotHaveAny = existingPlayerPositions.every(
-        (index) => !winPattern.includes(index?.id)
-      );
-
-      return systemHasAll && playerDoesNotHaveAny;
-    });
-
-    //select one of the pattern to be formed out of the many patterns selected
-    const randomWinPattern =
-      matchingWinPatterns[
-        randomizedSelectionFromArray(matchingWinPatterns?.length)
-      ];
-
-    const validPositions = getAvailableOptions(
-      randomWinPattern,
-      getUnavailableSquares()
-    );
-
-    return (
-      validPositions?.[randomizedSelectionFromArray(validPositions?.length)] ||
-      0
-    );
-  };
-
-  const preventPlayerFromWinning = () => {
-    const existingSystemPositions = getSystemSquares();
-    const existingPlayerPositions = getPlayerSquares();
-
-    const matchingWinPatterns = winPatterns.filter((winPattern) => {
-      const systemHasAll = existingPlayerPositions.every((index) =>
-        winPattern.includes(index?.id)
-      );
-
-      const playerDoesNotHaveAny = existingSystemPositions.every(
-        (index) => !winPattern.includes(index?.id)
-      );
-      return systemHasAll && playerDoesNotHaveAny;
-    });
-
-    const randomizedWinPattern =
-      matchingWinPatterns[
-        randomizedSelectionFromArray(matchingWinPatterns?.length)
-      ];
-
-    const validPositions = randomizedWinPattern?.filter(
-      (position) =>
-        !existingSystemPositions?.some((square) => square.id === position)
-    );
-    console.log("valid positions", validPositions);
-    console.log(
-      validPositions?.[randomizedSelectionFromArray(validPositions?.length)]
-    );
-
-    const unAvailableOptions = squares
-      .filter((square) => square.value)
-      .map((filteredSquare) => filteredSquare.id);
-    console.log("unavailable options", unAvailableOptions);
-    const removedUnavailbleFirstMoveOptions =
-      validPositions?.filter((item) => !unAvailableOptions.includes(item)) || 0;
-    console.log(removedUnavailbleFirstMoveOptions, "final");
-    return removedUnavailbleFirstMoveOptions[0] || 0;
-  };
-
-  const drawTheMatch = () => {
-    const availablePositions = squares.filter((square) => !square.value);
-    const moveIndex = randomizedSelectionFromArray(availablePositions?.length);
-    const move = availablePositions[moveIndex]?.id;
-    return move;
-  };
-
-  const evaluateBestMove = () => {
-    const blockPosition = preventPlayerFromWinning();
-    if (blockPosition) return blockPosition;
-    else {
-      const winningPosition = findWinningPosition();
-      if (winningPosition) return winningPosition;
-      else return drawTheMatch();
-    }
-  };
-
-  const decideNextMove = () => {
-    console.log("decisionk");
-    const moves = gameModeDetails?.noOfMoves["O"];
-    console.log(moves);
-    switch (moves) {
-      case 1:
-        return makeFirstMove();
-      case 2:
-        return evaluateBestMove();
-      default:
-        return evaluateBestMove();
-    }
+    setPlayer(() => (player === "X" ? "O" : "X"));
   };
 
   return (
@@ -252,17 +145,17 @@ const GameBoard = () => {
 
         {/* Game Board */}
         <div className="relative">
-          {pattern > 0 && <StrikeThrough pattern={pattern} />}
+          {/* {strikePattern > 0 && <StrikeThrough pattern={strikePattern} />} */}
           <div className="grid grid-cols-3 gap-2 bg-gray-50 p-4 rounded-lg shadow-sm">
-            {squares.map((item) => (
+            {squares.map((value, index) => (
               <button
-                key={item?.id}
+                key={index}
                 onClick={() => {
-                  handleSquareClick(item?.id);
+                  handleSquareClick(index);
                 }}
                 className="w-24 h-24 bg-white border border-gray-200 rounded-lg text-4xl font-bold flex items-center justify-center hover:bg-gray-50 transition-colors"
               >
-                {item.value}
+                {value}
               </button>
             ))}
           </div>
