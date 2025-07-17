@@ -1,9 +1,16 @@
 import React from "react";
 
-const Button = ({ children, className = "", ...props }) => {
+const Button = ({ children, className = "", variant = "solid", ...props }) => {
+  const baseStyles = "px-4 py-2 rounded-md transition-colors cursor-pointer";
+
+  const variants = {
+    solid: "bg-black text-white hover:bg-gray-800",
+    outlined: "border border-black text-black",
+  };
+
   return (
     <button
-      className={`px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors cursor-pointer ${className}`}
+      className={`${baseStyles} ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
@@ -11,4 +18,4 @@ const Button = ({ children, className = "", ...props }) => {
   );
 };
 
-export default Button; 
+export default Button;
