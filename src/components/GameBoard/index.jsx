@@ -9,7 +9,7 @@ const GameBoard = () => {
   const aiSymbol = "O";
   const user = aiSymbol === "X" ? "O" : "X";
   const didAiWinToss = false;
-  const [squares, setSquares] = useState(Array(9).fill(""));
+  const [squares, setSquares] = useState(Array(9).fill("X"));
   const [matchResults, setMatchResults] = useState({
     winner: "",
     isDraw: false,
@@ -204,9 +204,7 @@ const GameBoard = () => {
 
           {/* Game Board */}
           <div className="relative">
-            {matchResults.winner && (
-              <StrikeThrough pattern={matchResults.pattern} />
-            )}
+            {true && <StrikeThrough pattern={7} />}
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-4 rounded-lg shadow-sm">
               {squares.map((value, index) => (
                 <button
