@@ -204,7 +204,9 @@ const GameBoard = () => {
 
           {/* Game Board */}
           <div className="relative">
-            {true && <StrikeThrough pattern={7} />}
+            {matchResults.winner && (
+              <StrikeThrough pattern={matchResults.pattern} />
+            )}
             <div className="grid grid-cols-3 gap-2 bg-gray-50 p-4 rounded-lg shadow-sm">
               {squares.map((value, index) => (
                 <button
