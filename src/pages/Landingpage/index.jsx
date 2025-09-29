@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
+import Footer from "../../components/Footer";
 
 const LandingPage = () => {
   return (
@@ -41,7 +43,7 @@ const LandingPage = () => {
 
       {/* Play Button */}
       <Link
-        to="/auth"
+        to={ROUTES.AUTH}
         className="inline-block bg-black text-white px-6 py-3 rounded-md text-base font-medium hover:bg-gray-800 transition-colors my-8"
       >
         Play Now →
@@ -68,10 +70,7 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="mt-16 text-gray-600 text-sm">
-        © 2023 TicTacToe. All rights reserved.
-      </div>
+      <Footer />
     </div>
   );
 };

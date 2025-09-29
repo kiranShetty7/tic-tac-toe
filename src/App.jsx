@@ -11,6 +11,9 @@ import TossAndSymbolSelection from "./pages/TossAndSymbolSelection/index.jsx";
 import Friends from "./pages/Friends/index.jsx";
 import Leaderboard from "./pages/Leaderboard/index.jsx";
 import GameBoard from "./components/GameBoard";
+import NotFound from "./pages/NotFound/index.jsx"; // Import the NotFound component
+import Profile from "./pages/Profile/index.jsx";
+import { ROUTES } from "./constants/routes";
 import "./App.css";
 
 // Lazy load the remote auth app
@@ -20,7 +23,7 @@ function AuthWrapper() {
   const navigate = useNavigate();
 
   const onLoginSuccess = () => {
-    navigate("/mode");
+    navigate(ROUTES.MODE);
   };
 
   return (
@@ -32,36 +35,40 @@ function AuthWrapper() {
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: ROUTES.LANDING,
     element: <LandingPage />,
   },
   {
-    path: "/auth",
+    path: ROUTES.AUTH,
     element: <AuthWrapper />,
   },
   {
-    path: "/mode",
+    path: ROUTES.MODE,
     element: <GameMode />,
   },
   {
-    path: "/toss",
+    path: ROUTES.TOSS,
     element: <TossAndSymbolSelection />,
   },
-  // {
-  //   path: "/symbol-choice",
-  //   element: <SymbolChoice />,
-  // },
   {
-    path: "/friends",
+    path: ROUTES.FRIENDS,
     element: <Friends />,
   },
   {
-    path: "/leaderboard",
+    path: ROUTES.LEADERBOARD,
     element: <Leaderboard />,
   },
   {
-    path: "/game",
+    path: ROUTES.GAME,
     element: <GameBoard />,
+  },
+  {
+    path: ROUTES.PROFILE,
+    element: <Profile />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 

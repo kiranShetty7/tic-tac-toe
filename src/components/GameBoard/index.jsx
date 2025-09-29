@@ -3,13 +3,15 @@ import StrikeThrough from "../StrikeThrough";
 import { useNavigate } from "react-router-dom";
 import Button from "../Button";
 import { randomizedSelectionFromArray } from "../../helper";
+import { ROUTES } from "../../constants/routes";
+import Footer from "../Footer";
 
 const GameBoard = () => {
   const navigate = useNavigate();
   const aiSymbol = "O";
   const user = aiSymbol === "X" ? "O" : "X";
   const didAiWinToss = false;
-  const [squares, setSquares] = useState(Array(9).fill("X"));
+  const [squares, setSquares] = useState(Array(9).fill(""));
   const [matchResults, setMatchResults] = useState({
     winner: "",
     isDraw: false,
@@ -174,7 +176,7 @@ const GameBoard = () => {
               Play again?
             </div>
             <div className="flex gap-4">
-              <Button onClick={() => navigate("/toss")}>Yes</Button>
+              <Button onClick={() => navigate(ROUTES.TOSS)}>Yes</Button>
               <Button
                 onClick={() => setPlayAgainLayover(false)}
                 variant="outlined"
@@ -241,11 +243,7 @@ const GameBoard = () => {
             </div>
           )}
         </main>
-
-        {/* Footer */}
-        <footer className="p-4 text-center text-gray-600 text-sm">
-          © 2023 TicTacToe. All rights reserved.
-        </footer>
+        <Footer />
       </div>
     </>
   );

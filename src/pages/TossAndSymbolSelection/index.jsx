@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Toss from "../../components/Toss";
 import SymbolChoice from "../../components/SymbolChoice";
 import Button from "../../components/Button";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const TossAndSymbolSelection = () => {
   const navigate = useNavigate();
@@ -17,16 +19,11 @@ const TossAndSymbolSelection = () => {
     setIsUserTossWinner(state);
   };
 
+  const handleSignOut = () => navigate("/");
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Header */}
-      <header className="w-full p-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-xl">TicTacToe</span>
-        </div>
-        <Button onClick={() => navigate("/")}>Sign Out</Button>
-      </header>
-
+      <Header onSignOut={handleSignOut} />
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4">
         {tossMode ? (
@@ -43,9 +40,7 @@ const TossAndSymbolSelection = () => {
       </main>
 
       {/* Footer */}
-      <footer className="p-4 text-center text-gray-600 text-sm">
-        © 2023 TicTacToe. All rights reserved.
-      </footer>
+      <Footer />
     </div>
   );
 };

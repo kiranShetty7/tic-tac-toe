@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../Button";
 import { decisionMaker } from "../../helper";
+import { ROUTES } from "../../constants/routes";
 
 const SymbolChoice = ({ isUserTossWinner }) => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const SymbolChoice = ({ isUserTossWinner }) => {
   };
 
   const startGame = () => {
-    navigate("/game");
+    navigate(ROUTES.GAME);
   };
 
   return (
