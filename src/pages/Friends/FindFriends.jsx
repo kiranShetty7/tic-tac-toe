@@ -1,49 +1,259 @@
-import React from "react";
+import React, { useState } from "react";
+import { TextField, CircularProgress, Alert, Snackbar } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Button from "../../components/Button";
+import ErrorBoundary from "../../components/ErrorBoundary";
+import debounce from "lodash/debounce";
+import { useMutation, useQuery } from "@apollo/client";
+import apolloClient from "../../apollo";
+import {
+  GET_USERS_BY_EMAIL,
+  SEND_INVITE,
+  GET_SENT_INVITES,
+} from "../../graphql/queries";
 
-const FindFriends = ({ friendsList }) => (
-  <div className="flex-1">
-    <h2 className="text-2xl font-bold mb-6">Find Friends</h2>
-    <div className="mb-6">
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="Search friends by username..."
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-        />
-        <svg
-          className="absolute right-3 top-2.5 h-5 w-5 text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+const FindFriends = () => {
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const currentUserId = "6812cfb6e2a2a426c5a4dc39";
+
+  // ✅ Fetch all invites when the component loads
+  const { data: invitesData, loading: invitesLoading } = useQuery(
+    GET_SENT_INVITES,
+    {
+      variables: { userId: currentUserId },
+      fetchPolicy: "network-only",
+    }
+  );
+
+  const updateUserInviteState = (userId, isInvited) => {
+    setSearchResults((prev) =>
+      prev.map((user) => (user._id === userId ? { ...user, isInvited } : user))
+    );
+  };
+
+  const [sendInvite, { loading: sendingInvite }] = useMutation(SEND_INVITE, {
+    onCompleted: (data, { variables }) => {
+      const { success, message } = data.sendInvite;
+      if (success) {
+        const invitedUserId = variables.input.toUserId;
+        updateUserInviteState(invitedUserId, true);
+      } else {
+        setSnackbar({
+          open: true,
+          message: message || "Failed to send game invite",
+          severity: "error",
+        });
+      }
+    },
+    onError: (error) => {
+      const failedUserId = error.operation?.variables?.input?.toUserId;
+      if (failedUserId) {
+        updateUserInviteState(failedUserId, false);
+      }
+      setSnackbar({
+        open: true,
+        message: "Failed to send game invite",
+        severity: "error",
+      });
+    },
+  });
+
+  // ✅ Search users by email and mark already-invited ones
+  const searchUsers = async (searchText) => {
+    setInputValue(searchText);
+
+    if (!searchText) {
+      setSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await apolloClient.query({
+        query: GET_USERS_BY_EMAIL,
+        variables: {
+          email: searchText,
+          userId: currentUserId,
+        },
+        fetchPolicy: "network-only",
+      });
+
+      if (result.data?.getUsers?.success) {
+        const inviteUsers = invitesData?.getSentInvites?.users || [];
+
+        setSearchResults(
+          (result.data.getUsers.data || []).map((user) => ({
+            ...user,
+            isInvited: inviteUsers.includes(user._id),
+            isLoading: false,
+          }))
+        );
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const debouncedSearch = React.useMemo(
+    () => debounce((value) => searchUsers(value), 300),
+    [invitesData]
+  );
+
+  React.useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  const handleInvite = async (user) => {
+    if (user.isInvited || user.isLoading) return;
+
+    // Set loading state for this user
+    setSearchResults((prev) =>
+      prev.map((u) => (u._id === user._id ? { ...u, isLoading: true } : u))
+    );
+
+    try {
+      await sendInvite({
+        variables: {
+          input: {
+            fromUserId: currentUserId,
+            toUserId: user._id,
+          },
+        },
+      });
+    } finally {
+      // Clear loading state
+      setSearchResults((prev) =>
+        prev.map((u) => (u._id === user._id ? { ...u, isLoading: false } : u))
+      );
+    }
+  };
+
+  return (
+    <>
+      <div className="flex-1">
+        <h2 className="text-2xl font-bold mb-6">Find Friends</h2>
+        <div className="space-y-4">
+          <TextField
+            fullWidth
+            label="Search users by email"
+            variant="outlined"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              debouncedSearch(e.target.value);
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "0.375rem",
+                backgroundColor: "white",
+                "& fieldset": {
+                  borderColor: "rgba(0, 0, 0, 0.23)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "black",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "black",
+                  borderWidth: 2,
+                },
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "black",
+              },
+            }}
+            InputProps={{
+              endAdornment: loading ? (
+                <CircularProgress color="inherit" size={20} />
+              ) : null,
+            }}
           />
-        </svg>
-      </div>
-    </div>
-    <div className="space-y-4">
-      {friendsList.map((friend) => (
-        <div
-          key={friend.id}
-          className="flex items-center justify-between p-4 border border-gray-100 rounded-lg"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{friend.avatar}</span>
-            <div>
-              <h3 className="font-medium">{friend.name}</h3>
-              <p className="text-sm text-gray-500">{friend.status}</p>
+          <div className="relative">
+            {loading && searchResults.length === 0 && (
+              <div className="flex items-center justify-center py-8 bg-white rounded-lg border border-gray-100">
+                <CircularProgress size={32} />
+                <span className="ml-3 text-gray-600">
+                  Searching for users...
+                </span>
+              </div>
+            )}
+            {!loading && searchResults.length === 0 && !inputValue && (
+              <div className="text-center py-8 text-gray-500 bg-white rounded-lg border border-gray-100">
+                Start typing to search for users
+              </div>
+            )}
+            {!loading && searchResults.length === 0 && inputValue && (
+              <div className="text-center py-8 text-gray-500 bg-white rounded-lg border border-gray-100">
+                No such users
+              </div>
+            )}
+            <div className="space-y-2">
+              {searchResults.map((user) => (
+                <div
+                  key={user._id}
+                  className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-lg hover:border-gray-200 transition-colors duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <h3 className="font-medium">{user.name}</h3>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                    </div>
+                  </div>
+                  {user.isInvited ? (
+                    <div className="flex items-center gap-2 px-4 py-2 text-green-600">
+                      <CheckCircleIcon />
+                      <span className="text-sm">Invited</span>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="solid"
+                      className="text-sm min-w-[80px]"
+                      onClick={() => handleInvite(user)}
+                      disabled={user.isLoading}
+                    >
+                      {user.isLoading ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        "Invite"
+                      )}
+                    </Button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-          <Button className="text-sm">Invite</Button>
         </div>
-      ))}
-    </div>
-  </div>
-);
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </div>
+    </>
+  );
+};
 
 export default FindFriends;

@@ -1,23 +1,42 @@
 import React from "react";
-import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
-function ErrorFallback() {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
-      <div className="max-w-md w-full text-center">
-        <h1 className="text-4xl font-bold mb-4 text-red-500">Something went wrong</h1>
-        <p className="text-gray-600 mb-8">An unexpected error occurred. Please try refreshing the page or come back later.</p>
-      </div>
-    </div>
-  );
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Error:", error);
+    console.error("Error Info:", errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+          <h2 className="text-lg font-semibold text-red-700 mb-2">
+            Something went wrong
+          </h2>
+          <p className="text-red-600 mb-4">
+            Please try again or refresh the page.
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false })}
+            className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200"
+          >
+            Try Again
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
-function ErrorBoundary({ children }) {
-  return (
-    <ReactErrorBoundary FallbackComponent={ErrorFallback}>
-      {children}
-    </ReactErrorBoundary>
-  );
-}
-
-export default ErrorBoundary; 
+export default ErrorBoundary;

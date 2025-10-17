@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@apollo/client": "^3.7.17",
     "@babel/core": "^7.27.4",
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-react": "^7.27.1",
@@ -21,11 +22,13 @@
     "@mui/material": "^7.3.2",
     "@tailwindcss/cli": "^4.1.10",
     "babel-loader": "^10.0.0",
+    "graphql": "^16.11.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.28.3",
     "@tailwindcss/postcss": "^4.1.10",
     "autoprefixer": "^10.4.21",
     "css-loader": "^7.1.2",
