@@ -6,13 +6,10 @@ import ErrorBoundary from "../../components/ErrorBoundary";
 import debounce from "lodash/debounce";
 import { useMutation, useQuery } from "@apollo/client";
 import apolloClient from "../../apollo";
-import {
-  GET_USERS_BY_EMAIL,
-  SEND_INVITE,
-  GET_SENT_INVITES,
-} from "../../graphql/queries";
+import { GET_USERS_BY_EMAIL } from "../../graphql/queries";
+import { SEND_INVITE } from "../../graphql/mutations";
 
-const FindFriends = () => {
+const FindFriends = ({ sentInvites }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -22,16 +19,7 @@ const FindFriends = () => {
     severity: "success",
   });
 
-  const currentUserId = "6812cfb6e2a2a426c5a4dc39";
-
-  // ✅ Fetch all invites when the component loads
-  const { data: invitesData, loading: invitesLoading } = useQuery(
-    GET_SENT_INVITES,
-    {
-      variables: { userId: currentUserId },
-      fetchPolicy: "network-only",
-    }
-  );
+  const currentUserId = localStorage.getItem("userId") || "";
 
   const updateUserInviteState = (userId, isInvited) => {
     setSearchResults((prev) =>
@@ -87,14 +75,17 @@ const FindFriends = () => {
       });
 
       if (result.data?.getUsers?.success) {
-        const inviteUsers = invitesData?.getSentInvites?.users || [];
+        const invitedUserIds = sentInvites.map((invite) => invite.to._id) || [];
 
+        // Filter out already invited users and map remaining ones
         setSearchResults(
-          (result.data.getUsers.data || []).map((user) => ({
-            ...user,
-            isInvited: inviteUsers.includes(user._id),
-            isLoading: false,
-          }))
+          (result.data.getUsers.data || [])
+            .filter((user) => !invitedUserIds.includes(user._id))
+            .map((user) => ({
+              ...user,
+              isInvited: false,
+              isLoading: false,
+            }))
         );
       } else {
         setSearchResults([]);
@@ -109,7 +100,7 @@ const FindFriends = () => {
 
   const debouncedSearch = React.useMemo(
     () => debounce((value) => searchUsers(value), 300),
-    [invitesData]
+    [sentInvites]
   );
 
   React.useEffect(() => {

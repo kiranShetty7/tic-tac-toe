@@ -13,20 +13,6 @@ export const GET_USERS_BY_EMAIL = gql`
   }
 `;
 
-export const SEND_INVITE = gql`
-  mutation SendInvite($input: InviteInput!) {
-    sendInvite(input: $input) {
-      success
-      message
-      invite {
-        from
-        to
-        gameId
-      }
-    }
-  }
-`;
-
 export const GET_SENT_INVITES = gql`
   query getSentInvites($userId: ID!) {
     getSentInvites(userId: $userId) {
@@ -35,10 +21,13 @@ export const GET_SENT_INVITES = gql`
       invites {
         _id
         from
-        to
+        to {
+          _id
+          name
+          email
+        }
         gameId
       }
-      users
     }
   }
 `;

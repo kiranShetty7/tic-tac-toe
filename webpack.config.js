@@ -11,7 +11,7 @@ const __dirname = dirname(__filename);
 export default {
   mode: "development",
   entry: "./src/index.jsx",
-  devtool: "source-map",
+  devtool: "eval-source-map",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js",
@@ -29,7 +29,15 @@ export default {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
+            presets: [
+              "@babel/preset-env",
+              [
+                "@babel/preset-react",
+                {
+                  runtime: "automatic", // Enable the new JSX transform
+                },
+              ],
+            ],
             plugins: ["@babel/plugin-transform-runtime"],
           },
         },
@@ -65,10 +73,10 @@ export default {
         authApp: "authApp@http://localhost:3000/remoteEntry.js",
       },
       shared: {
-        react: { singleton: true, requiredVersion: "^18.0.0" },
+        react: { singleton: true, requiredVersion: "^19.0.0" },
         "react-dom": {
           singleton: true,
-          requiredVersion: "^18.0.0",
+          requiredVersion: "^19.0.0",
         },
       },
     }),

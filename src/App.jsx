@@ -10,7 +10,7 @@ import GameMode from "./pages/GameMode/index.jsx";
 import TossAndSymbolSelection from "./pages/TossAndSymbolSelection/index.jsx";
 import Friends from "./pages/Friends/index.jsx";
 import Leaderboard from "./pages/Leaderboard/index.jsx";
-import GameBoard from "./components/GameBoard";
+import PlayerGameBoard from "./pages/playerGameBoard/index.jsx";
 import NotFound from "./pages/NotFound/index.jsx"; // Import the NotFound component
 import Profile from "./pages/Profile/index.jsx";
 import { ROUTES } from "./constants/routes";
@@ -60,7 +60,7 @@ const router = createBrowserRouter([
   },
   {
     path: ROUTES.GAME,
-    element: <GameBoard />,
+    element: <PlayerGameBoard />,
   },
   {
     path: ROUTES.PROFILE,
