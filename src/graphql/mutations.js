@@ -13,3 +13,21 @@ export const SEND_INVITE = gql`
     }
   }
 `;
+
+export const ACCEPT_INVITE = gql`
+  mutation AcceptInvite($inviteId: ID!) {
+    acceptInvite(inviteId: $inviteId) {
+      success
+      message
+    }
+  }
+`;
+
+export const REJECT_INVITE = gql`
+  mutation RejectInvite($inviteId: ID!) {
+    rejectInvite(inviteId: $inviteId) {
+      success
+      message
+    }
+  }
+`;

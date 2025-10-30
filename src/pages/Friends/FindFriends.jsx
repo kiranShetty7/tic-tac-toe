@@ -9,7 +9,7 @@ import apolloClient from "../../apollo";
 import { GET_USERS_BY_EMAIL } from "../../graphql/queries";
 import { SEND_INVITE } from "../../graphql/mutations";
 
-const FindFriends = ({ sentInvites }) => {
+const FindFriends = ({ sentInvites, refetchSentInvites }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -33,6 +33,7 @@ const FindFriends = ({ sentInvites }) => {
       if (success) {
         const invitedUserId = variables.input.toUserId;
         updateUserInviteState(invitedUserId, true);
+        refetchSentInvites();
       } else {
         setSnackbar({
           open: true,

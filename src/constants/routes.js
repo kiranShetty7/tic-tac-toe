@@ -3,6 +3,7 @@ export const ROUTES = {
   AUTH: "/auth",
   MODE: "/mode",
   TOSS: "/toss",
+  TOSS_WITH_ID: "/toss/:gameId",
   FRIENDS: "/friends-invitations",
   LEADERBOARD: "/leaderboard",
   GAME: "/game",

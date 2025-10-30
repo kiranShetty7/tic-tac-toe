@@ -51,6 +51,10 @@ const router = createBrowserRouter([
     element: <TossAndSymbolSelection />,
   },
   {
+    path: ROUTES.TOSS_WITH_ID,
+    element: <TossAndSymbolSelection />,
+  },
+  {
     path: ROUTES.FRIENDS,
     element: <Friends />,
   },

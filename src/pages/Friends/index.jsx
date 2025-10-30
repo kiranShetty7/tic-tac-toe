@@ -14,7 +14,11 @@ const Friends = () => {
 
   const userId = localStorage.getItem("userId") || "";
 
-  const { data: sentInvitesData, loading } = useQuery(GET_SENT_INVITES, {
+  const {
+    data: sentInvitesData,
+    loading,
+    refetch: refetchSentInvites,
+  } = useQuery(GET_SENT_INVITES, {
     variables: { userId },
     fetchPolicy: "network-only",
   });
@@ -26,16 +30,15 @@ const Friends = () => {
       <Header onSignOut={handleSignOut} />
       {/* Main Content */}
       <main className="flex-1 flex flex-col md:flex-row gap-8 p-8">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <CircularProgress />
-          </div>
-        ) : (
-          <>
-            <FindFriends sentInvites={sentInvites} />
-            <GameInvitations sentInvites={sentInvites} />
-          </>
-        )}
+        <FindFriends
+          sentInvites={sentInvites}
+          refetchSentInvites={refetchSentInvites}
+          loading={loading}
+        />
+        <GameInvitations
+          sentInvites={sentInvites}
+          sentInvitesLoading={loading}
+        />
       </main>
       <Footer />
     </div>
